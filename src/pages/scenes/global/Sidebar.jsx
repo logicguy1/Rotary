@@ -2,7 +2,8 @@ import { useState, useContext } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 // import "react-pro-sidebar/dist/css/styles.css";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
+import Link from 'next/link'
 import { tokens } from "../../theme.js";
 
 import { LoginContext } from "../../contexts/Login.js";
@@ -44,7 +45,7 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
       icon={icon}
     >
       <Typography>{title}</Typography>
-      <Link to={to} />
+      <Link href={to} />
     </MenuItem>
   );
 };
