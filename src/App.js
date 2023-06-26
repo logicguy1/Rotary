@@ -1,13 +1,9 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
-
 import { useState } from "react";
 import { ColorModeContext, useMode } from "./theme";
 import { LoginContext } from "./contexts/Login.js";
 import { ReloadContext } from "./contexts/Reload.js";
 import { CssBaseline, ThemeProvider } from "@mui/material";
+import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -19,12 +15,7 @@ import Login from "./scenes/login";
 import Apps from "./scenes/applications";
 import AdminApps from "./scenes/admin/applications";
 
-import './index.css';
-import App from './App';
-
-const inter = Inter({ subsets: ['latin'] })
-
-export default function Home() {
+function App() {
   const [theme, colorMode] = useMode();
   const location = useLocation();
   const [user, setUser] = useState({});
@@ -35,7 +26,6 @@ export default function Home() {
   }
 
   return (
-  <React.StrictMode>
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -58,7 +48,7 @@ export default function Home() {
         </LocalizationProvider>
       </ThemeProvider>
     </ColorModeContext.Provider>
-  </React.StrictMode>
-  )
+  );
 }
 
+export default App;
