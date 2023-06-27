@@ -15,14 +15,14 @@ import Paper from '@mui/material/Paper';
 import { LoginContext } from "../../contexts/Login.js";
 import { ReloadContext } from "../../contexts/Reload.js";
 
-import { applications, application_tmp } from "../../data/mockData.js";
+import { application_tmp } from "../../data/mockData.js";
 import { getJson, postJson } from "../../data/dataHook.js";
 
 import Header from "../../components/Header";
 import QuestioneerInput from "../../components/QuestioneerInput";
 import UserInfo from "../../components/UserInfo";
 
-const submitForm = (e, flag, app) => {
+const submitForm = (e, flag, app, user) => {
   e.preventDefault();
   console.log(e, flag);
   // TODO: Save output data
@@ -42,6 +42,16 @@ const submitForm = (e, flag, app) => {
 
   switch (flag) {
     case "Gem":
+      const data = {
+        user: user,
+        app: obj
+      };
+
+      console.log(data)
+      postJson(`/uploadFile?id=${user.user_id}`, data).then((res) => {
+        console.log(res);
+        alert("Saved");
+      });
       
       break;
 
@@ -63,6 +73,7 @@ const Apps = () => {
   const { user, setUser } = useContext(LoginContext);
   const [ activeApp, setActiveApp ] = useState(-1);
   const [ application, setApplication ] = useState({});
+  const [ applications, setApplications ] = useState([]);
   const [flag, setFlag] = useState("Indsend");
 
   const { reload, setReload } = useContext(ReloadContext);
@@ -73,18 +84,26 @@ const Apps = () => {
 
   useEffect(() => {
     console.log(id)
-    setActiveApp(id);
+    if (id != undefined && id != -1) {
+      setActiveApp(id);
+    }
     console.log(activeApp)
   }, [id]);
 
   useEffect(() => {
+    setApplication(application_tmp);
     console.log("THIS IS THE ACTIVE APP", activeApp);
 
     if (activeApp != undefined && activeApp != -1) {
       getJson(`/getApplication?id=${activeApp}`)
       .then(res => {
-        //console.log(res);
+        console.log(res);
         setApplication(res);
+      });
+    } else {
+      getJson(`/getAllApplications?d=${Date.now()}`).then(res => {
+        console.log(res);
+        setApplications(res);
       });
     }
   }, [activeApp])
@@ -117,9 +136,9 @@ const Apps = () => {
                       sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                       onClick={(e) => {setActiveApp(row.id)}}
                     >
-                      <TableCell>{row.name}</TableCell>
-                      <TableCell>{row.start}</TableCell>
-                      <TableCell>{row.stop}</TableCell>
+                      <TableCell>{row.title}</TableCell>
+                      <TableCell>{row.start.split(" ")[0]}</TableCell>
+                      <TableCell>{row.stop.split(" ")[0]}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

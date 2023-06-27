@@ -112,16 +112,22 @@ const Login = () => {
         { !isAdmin ? (
           <>
           <div>
-            <TextField id="outlined-basic" label="Medlemsnummer" name="Medlemsnummer" variant="outlined" />
-            <TextField id="outlined-basic" label="Navn" name="Navn" variant="outlined" />
+            <TextField id="outlined-basic" required label="Medlemsnummer" name="Medlemsnummer" variant="outlined" inputProps={{
+              inputMode: 'numeric', 
+              pattern: '[0-9]*', 
+            }}/>
+            <TextField id="outlined-basic" required label="Navn" name="Navn" variant="outlined" />
           </div>
           <div>
-            <TextField id="outlined-basic" label="Distrikt" name="Distrikt" variant="outlined" />
-            <TextField id="outlined-basic" label="Klub" name="Klub" variant="outlined" />
+            <TextField id="outlined-basic" required label="Distrikt" name="Distrikt" variant="outlined" />
+            <TextField id="outlined-basic" required label="Klub" name="Klub" variant="outlined" />
           </div>
           <div>
-            <TextField id="outlined-basic" label="Email" name="Email" variant="outlined" />
-            <TextField id="outlined-basic" label="Telefon nr." name="Telefon" variant="outlined" />
+            <TextField id="outlined-basic" required label="Email" name="Email" variant="outlined" inputProps={{
+              inputMode: 'numeric', 
+              pattern: '^[^\s@]+@[^\s@]+\.[^\s@]+$', 
+            }}/>
+            <TextField id="outlined-basic" required label="Telefon nr." name="Telefon" variant="outlined" />
           </div>
           </>
         ) : (

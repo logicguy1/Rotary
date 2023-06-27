@@ -47,7 +47,7 @@ const UserInfo = () => {
       borderTop={`2px solid ${colors.primary[400]}`}
     >
       <Row title="Navn" value={user.name} />
-      <Row title="Bruger ID" value={user.user_id} />
+      <Row title="Medlemsnummer" value={user.user_id} />
       <Row title="Distrikt" value={user.distrikt} />
       <Row title="Klub" value={user.klub} />
       <Row title="Email" value={user.email} />

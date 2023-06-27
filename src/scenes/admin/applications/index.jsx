@@ -56,8 +56,8 @@ const createNewForm = (user, setActiveApp) => {
   });
 }
 
-const save_changes = (form, setActiveApp) => {
-  postJson("/updateApplication", form).then(res => {
+const save_changes = (form, setActiveApp, user) => {
+  postJson("/updateApplication", { ...form, token: user.auth }).then(res => {
     console.log(res);
     setActiveApp(-1);
   });
@@ -295,7 +295,7 @@ const AdminApps = () => {
               size="large" 
               color="success"
               sx={{ mt: 1, width: '16ch'}}
-              onClick={(e) => {save_changes(application, setActiveApp)}}
+              onClick={(e) => {save_changes(application, setActiveApp, user)}}
             >Gem</Button>
             <Button 
               variant="contained" 
