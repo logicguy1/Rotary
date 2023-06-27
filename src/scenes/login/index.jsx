@@ -3,9 +3,9 @@ import Button, { ButtonProps } from '@mui/material/Button';
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import { tokens } from "../../theme";
-import { useContext, useState, useEffect } from "react";
 import { Navigate, useParams } from "react-router-dom";
 
+import { useContext, useState, useEffect } from "react";
 import { LoginContext } from "../../contexts/Login.js";
 import { getJson, postJson } from "../../data/dataHook.js";
 
@@ -13,31 +13,45 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import Header from "../../components/Header";
 
-const onSubmitLogin = (e, setUser, isAdmin) => {
+const onSubmitLogin = (e, setUser, isAdmin, setError) => {
   e.preventDefault();
 
   if (!isAdmin) {
-    setUser({
-      "user_id": e.target.Medlemsnummer.value,
-      "name": e.target.Navn.value,
-      "distrikt": e.target.Distrikt.value,
-      "klub": e.target.Klub.value,
-      "email": e.target.Email.value,
-      "number": e.target.Telefon.value,
-      "isAdmin": false
-    });
+    postJson(`/applicantLogin`, {
+        "user_id": e.target.Medlemsnummer.value,
+        "name": e.target.Navn.value,
+        "distrikt": e.target.Distrikt.value,
+        "klub": e.target.Klub.value,
+        "email": e.target.Email.value,
+        "number": e.target.Telefon.value,
+      })
+      .then(res => {
+        setUser({
+          "user_id": e.target.Medlemsnummer.value,
+          "name": e.target.Navn.value,
+          "distrikt": e.target.Distrikt.value,
+          "klub": e.target.Klub.value,
+          "email": e.target.Email.value,
+          "number": e.target.Telefon.value,
+          "isAdmin": false
+        });
+      });
   } else {
     postJson(`/login`, {
         "email": e.target.EmailAdmin.value,
         "password": e.target.AdgangskodeAdmin.value
       })
       .then(res => {
-        let token = res.token;
-        setUser({
-          "email": e.target.EmailAdmin.value,
-          "auth": token,
-          "isAdmin": true
-        });
+        if (res.status == "Error") {
+          setError(res.message);
+        } else {
+          let token = res.token;
+          setUser({
+            "email": e.target.EmailAdmin.value,
+            "auth": token,
+            "isAdmin": true
+          });
+        }
       });
 
     // let token = e.target.AdgangskodeAdmin.value
@@ -51,16 +65,20 @@ const Login = () => {
   const { user, setUser } = useContext(LoginContext);
   const [title, setTitle] = useState("Rotary Login")
   const [ isAdmin, setIsAdmin ] = useState(false);
+  const [error, setError] = useState("");
 
   let { id } = useParams();
 
   useEffect(() => {
     // TODO: use the id to fetch title and set title using setTitle
     if (id !== -1 && id != undefined) {
+      console.log("IT IS NOT UNDEFINED", id)
       getJson(`/getApplication?id=${id}`)
       .then(res => {
         console.log(res)
       });
+    } else {
+      console.log("IT IS UNDEFINED", id)
     }
   }, [id])
 
@@ -77,7 +95,7 @@ const Login = () => {
         backgroundColor={colors.primary[400]}
         p={5}
         component="form"
-        onSubmit={(e) => {onSubmitLogin(e, setUser, isAdmin)}}
+        onSubmit={(e) => {onSubmitLogin(e, setUser, isAdmin, setError)}}
         sx={{
           '& .MuiTextField-root': { m: 1, width: '35ch' },
           '& .Mui-focused': { color: colors.grey[200] }
@@ -128,6 +146,14 @@ const Login = () => {
         )
 
         }
+        <Typography 
+          variant="h6"
+          color={colors.redAccent[400]}
+          sx={{ ml: 1 }}
+        >
+          {error}
+        </Typography>  
+        
         <Box
           flexDirection="row"
           display="flex"

@@ -1,4 +1,3 @@
-
 import { Box, Typography, useTheme, TextField, IconButton, Modal } from "@mui/material";
 import Button, { ButtonProps } from '@mui/material/Button';
 import { tokens } from "../../../theme";
@@ -19,43 +18,62 @@ import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import { LoginContext } from "../../../contexts/Login.js";
 import { ReloadContext } from "../../../contexts/Reload.js";
 
-import { applications, application_tmp } from "../../../data/mockData.js";
+import { application_tmp } from "../../../data/mockData.js";
 
 import Header from "../../../components/Header";
 import AdminQuestioneerInput from "../../../components/AdminQuestioneerInput";
 
-const submitForm = (e, flag, app) => {
-  e.preventDefault();
-  console.log(e, flag);
-  // TODO: Save output data
+import { getJson, postJson } from "../../../data/dataHook.js";
 
-  // Isolate the application fields with data in them
-  let filtered = app.form.filter((item) => {
-    return !["plaintext"].includes(item.type);
+const createNewForm = (user, setActiveApp) => {
+  const date = new Date();
+
+  let day = date.getDate();
+  let month = date.getMonth() + 1;
+  let year = date.getFullYear();
+
+  let currentDate = `${month}/${day}/${year}`;
+
+  const data = {
+    title: "Ny ansøgning",
+    subtitle: "",
+    start: currentDate,
+    stop: currentDate,
+    desc: "",
+    mail: "just@hartoft.dk",
+    forms: [
+      {
+        label: "Dato",
+        type: "text",
+        required: true
+      }
+    ],
+    token: user.auth
+  };
+
+  postJson("/createApplication", data).then(res => {
+    setActiveApp(res.appId)
   });
-  
-  let res = filtered.map((item) => {
-    return [item.id, e.target[`inp${item.id}`].value]
-  });
-  let obj = Object.fromEntries(res);
-  console.log(obj);
-
-  // Obj er et objekt hvor keys er id og value er svar, brug når der skal gemmes 
-
-  switch (flag) {
-    case "Gem":
-      
-      break;
-
-    case "Indsend":
-
-      break;
-
-    default:
-      break;
-  }
 }
 
+const save_changes = (form, setActiveApp) => {
+  postJson("/updateApplication", form).then(res => {
+    console.log(res);
+    setActiveApp(-1);
+  });
+}
+
+const addQuestion = (application, setApplication) => {
+  console.log("ADD QUESTION", application)
+  const tmpApp = JSON.parse(JSON.stringify(application));
+  tmpApp.form.push({
+    "id": parseInt(Math.random()*1000000),
+    "type": "text",
+    "label": "Nyt Spøgsmål",
+    "required": true,
+  })
+  setApplication(tmpApp);
+}
 
 const AdminApps = () => {
   const theme = useTheme();
@@ -64,10 +82,37 @@ const AdminApps = () => {
   const { user, setUser } = useContext(LoginContext);
   const [ activeApp, setActiveApp ] = useState(-1);
   const [ application, setApplication ] = useState({});
-  const [flag, setFlag] = useState("Indsend");
+  const [ applications, setApplications ] = useState([]);
+  const [ flag, setFlag ] = useState("Indsend");
 
   useEffect(() => {
-    setApplication(application_tmp)
+    setApplication(application_tmp);
+    if (activeApp != -1 || activeApp == undefined) {
+      console.log("Calling active app", activeApp)
+      getJson(`/getApplication?id=${activeApp}&d=${Date.now()}`).then(res => {
+        console.log(res);
+
+        let date = new Date(res.start);
+        let day = date.getDate();
+        let month = date.getMonth() + 1;
+        let year = date.getFullYear();
+        res.start = `${month}/${day}/${year}`;
+
+        date = new Date(res.stop);
+        day = date.getDate();
+        month = date.getMonth() + 1;
+        year = date.getFullYear();
+        res.stop = `${month}/${day}/${year}`;
+        console.log(res);
+
+        setApplication(res);
+      });
+    } else {
+      getJson(`/getAllApplications?d=${Date.now()}`).then(res => {
+        console.log(res);
+        setApplications(res);
+      });
+    }
   }, [activeApp])
 
   const { reload, setReload } = useContext(ReloadContext);
@@ -89,6 +134,38 @@ const AdminApps = () => {
     setApplication(application => ({
       ...application,
       ...updatedValue
+    }))
+  }
+
+  const update_desc = (e) => {
+    let updatedValue = {desc: e.target.value};
+    setApplication(application => ({
+      ...application,
+      ...updatedValue
+    }))
+  }
+
+  const update_email = (e) => {
+    let updatedvalue = {mail: e.target.value};
+    setApplication(application => ({
+      ...application,
+      ...updatedvalue
+    }))
+  }
+
+  const update_start = (day, month, year) => {
+    let updatedvalue = {start: `${year}-${month}-${day}`};
+    setApplication(application => ({
+      ...application,
+      ...updatedvalue
+    }))
+  }
+
+  const update_stop = (day, month, year) => {
+    let updatedvalue = {stop: `${year}-${month}-${day}`};
+    setApplication(application => ({
+      ...application,
+      ...updatedvalue
     }))
   }
   // Handle namechange modals
@@ -124,9 +201,9 @@ const AdminApps = () => {
                       sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                       onClick={(e) => {setActiveApp(row.id)}}
                     >
-                      <TableCell>{row.name}</TableCell>
-                      <TableCell>{row.start}</TableCell>
-                      <TableCell>{row.stop}</TableCell>
+                      <TableCell>{row.title}</TableCell>
+                      <TableCell>{row.start.split(" ")[0]}</TableCell>
+                      <TableCell>{row.stop.split(" ")[0]}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -138,11 +215,10 @@ const AdminApps = () => {
               size="large" 
               color="info"
               sx={{ mt: 1, width: '16ch'}}
-              onClick={(e) => {console.log(e)}}
+              onClick={e => (createNewForm(user, setActiveApp))}
             >Tilføj ny</Button>
           </> : <Box
               component="form"
-              onSubmit={(e) => {submitForm(e, flag, application)}}
             >
             <Box
               flexDirection="row"
@@ -174,7 +250,8 @@ const AdminApps = () => {
                 rows={5}
                 sx={{ width: 700, mr: 1 }}
                 label="Beskrivelse"
-                defaultValue={application.desc}
+                value={application.desc}
+                onChange={e => (update_desc(e))}
               />
             </Box>
 
@@ -193,7 +270,8 @@ const AdminApps = () => {
                 }}
                 sx={{ width: 700, mr: 1 }}
                 label="Emails, seperet af et komma"
-                defaultValue={application.emails}
+                value={application.mail}
+                onChange={e => (update_email(e))}
               />
             </Box>
 
@@ -205,8 +283,8 @@ const AdminApps = () => {
               borderTop={`2px solid ${colors.primary[400]}`}
               gap={2}
             >
-              <DatePicker label="Start dato" defaultValue={dayjs(application.start)} />
-              <DatePicker label="Slut dato" defaultValue={dayjs(application.stop)} />
+              <DatePicker label="Start dato" value={dayjs(application.start)} onChange={e => (update_start(e["$D"], e["$M"]+1, e["$y"]))} />
+              <DatePicker label="Slut dato" value={dayjs(application.stop)} onChange={e => (update_stop(e["$D"], e["$M"]+1, e["$y"]))} />
             </Box>
 
             {application.form.map(row => {
@@ -214,18 +292,17 @@ const AdminApps = () => {
             })}
             <Button 
               variant="contained" 
-              type="submit"
               size="large" 
               color="success"
               sx={{ mt: 1, width: '16ch'}}
-              onClick={(e) => {setFlag("Gem")}}
+              onClick={(e) => {save_changes(application, setActiveApp)}}
             >Gem</Button>
             <Button 
               variant="contained" 
               size="large" 
               color="info"
               sx={{ mt: 1, ml: 1, width: '26ch'}}
-              onClick={(e) => {setFlag("Gem")}}
+              onClick={(e) => {addQuestion(application, setApplication)}}
             >Tilføj Spørgsmål</Button>
 
 
@@ -256,7 +333,7 @@ const AdminApps = () => {
                   onChange={(e) => {update(e.target.value)}}
                   sx={{ width: 500, mr: 1 }}
                   label="Titel"
-                  defaultValue={application.title}
+                  value={application.title}
                 />
                 <Box mb={3}></Box>
                 <TextField
@@ -268,7 +345,7 @@ const AdminApps = () => {
                   onChange={(e) => {update_sub(e.target.value)}}
                   sx={{ width: 500, mr: 1 }}
                   label="Undertitel"
-                  defaultValue={application.subtitle}
+                  value={application.subtitle}
                 />
                   <Button 
                     variant="contained" 

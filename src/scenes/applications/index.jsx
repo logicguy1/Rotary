@@ -16,6 +16,7 @@ import { LoginContext } from "../../contexts/Login.js";
 import { ReloadContext } from "../../contexts/Reload.js";
 
 import { applications, application_tmp } from "../../data/mockData.js";
+import { getJson, postJson } from "../../data/dataHook.js";
 
 import Header from "../../components/Header";
 import QuestioneerInput from "../../components/QuestioneerInput";
@@ -72,12 +73,20 @@ const Apps = () => {
 
   useEffect(() => {
     console.log(id)
-    setActiveApp(parseInt(id));
+    setActiveApp(id);
     console.log(activeApp)
   }, [id]);
 
   useEffect(() => {
-    setApplication(application_tmp)
+    console.log("THIS IS THE ACTIVE APP", activeApp);
+
+    if (activeApp != undefined && activeApp != -1) {
+      getJson(`/getApplication?id=${activeApp}`)
+      .then(res => {
+        //console.log(res);
+        setApplication(res);
+      });
+    }
   }, [activeApp])
 
   return (

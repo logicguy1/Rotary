@@ -86,6 +86,17 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
     }
   }
 
+  const updateInput = (e, rowid) => {
+    for (let i = 0; i < application.form.length; i++) {
+      if (application.form[i].id === rowid) {
+
+        let tmpApp = { ...application };
+        tmpApp.form[i].label = e.target.value;
+        setApplication(tmpApp);
+      }
+    }
+  }
+
   switch (type) {
     case "plaintext":
       return (
@@ -106,6 +117,7 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
             rows={2}
             sx={{ width: 299, mr: 1 }}
             value={row.label}
+            onChange={e => (updateInput(e, row.id))}
           />
           <Select
             labelId="demo-simple-select-label"
@@ -145,6 +157,7 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
             rows={2}
             sx={{ width: 299, mr: 1 }}
             value={row.label}
+            onChange={e => (updateInput(e, row.id))}
           />
           
 
@@ -186,6 +199,7 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
             rows={2}
             sx={{ width: 299, mr: 1 }}
             value={row.label}
+            onChange={e => (updateInput(e, row.id))}
           />
 
           <Select
@@ -231,6 +245,7 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
               rows={2}
               sx={{ width: 299, mr: 1 }}
               value={row.label}
+              onChange={e => (updateInput(e, row.id))}
             />
 
 
