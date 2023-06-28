@@ -116,6 +116,7 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
             multiline
             rows={2}
             sx={{ width: 299, mr: 1 }}
+            placeholder="Nyt spøgsmål"
             value={row.label}
             onChange={e => (updateInput(e, row.id))}
           />
@@ -156,6 +157,7 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
             multiline
             rows={2}
             sx={{ width: 299, mr: 1 }}
+            placeholder="Nyt spøgsmål"
             value={row.label}
             onChange={e => (updateInput(e, row.id))}
           />
@@ -198,6 +200,7 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
             multiline
             rows={2}
             sx={{ width: 299, mr: 1 }}
+            placeholder="Nyt spøgsmål"
             value={row.label}
             onChange={e => (updateInput(e, row.id))}
           />
@@ -244,6 +247,7 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
               multiline
               rows={2}
               sx={{ width: 299, mr: 1 }}
+            placeholder="Nyt spøgsmål"
               value={row.label}
               onChange={e => (updateInput(e, row.id))}
             />

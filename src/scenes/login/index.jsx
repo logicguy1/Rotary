@@ -27,6 +27,7 @@ const onSubmitLogin = (e, setUser, isAdmin, setError) => {
       })
       .then(res => {
         setUser({
+          "server_id": res.id,
           "user_id": e.target.Medlemsnummer.value,
           "name": e.target.Navn.value,
           "distrikt": e.target.Distrikt.value,
@@ -63,9 +64,10 @@ const Login = () => {
   const colors = tokens(theme.palette.mode);
 
   const { user, setUser } = useContext(LoginContext);
-  const [title, setTitle] = useState("Rotary Login")
+  const [ title, setTitle ] = useState("Rotary Login")
+  const [ subtitle, setSubtitle ] = useState("")
   const [ isAdmin, setIsAdmin ] = useState(false);
-  const [error, setError] = useState("");
+  const [ error, setError ] = useState("");
 
   let { id } = useParams();
 
@@ -75,7 +77,9 @@ const Login = () => {
       console.log("IT IS NOT UNDEFINED", id)
       getJson(`/getApplication?id=${id}`)
       .then(res => {
-        console.log(res)
+        console.log(res, res.subtitle)
+        setTitle(res.title);
+        setSubtitle(res.subtitle);
       });
     } else {
       console.log("IT IS UNDEFINED", id)
@@ -97,25 +101,20 @@ const Login = () => {
         component="form"
         onSubmit={(e) => {onSubmitLogin(e, setUser, isAdmin, setError)}}
         sx={{
-          '& .MuiTextField-root': { m: 1, width: '35ch' },
+          '& .MuiTextField-root': { m: 1, width: 'calc(50% - 16px)' },
           '& .Mui-focused': { color: colors.grey[200] }
         }}
       >
-        <Typography 
-          variant="h2"
-          color={colors.grey[100]}
-          fontWeight="bold"
-          sx={{ mb: 1, ml: 1 }}
-        >
-          {title}
-        </Typography>  
         { !isAdmin ? (
           <>
+          <Box sx={{ ml: 1 }} >
+            <Header title={title} subtitle={subtitle} margin={'none'} />        
+          </Box>
           <div>
             <TextField id="outlined-basic" required label="Medlemsnummer" name="Medlemsnummer" variant="outlined" inputProps={{
               inputMode: 'numeric', 
               pattern: '[0-9]*', 
-            }}/>
+            }} />
             <TextField id="outlined-basic" required label="Navn" name="Navn" variant="outlined" />
           </div>
           <div>
@@ -124,14 +123,16 @@ const Login = () => {
           </div>
           <div>
             <TextField id="outlined-basic" required label="Email" name="Email" variant="outlined" inputProps={{
-              inputMode: 'numeric', 
-              pattern: '^[^\s@]+@[^\s@]+\.[^\s@]+$', 
+              inputMode: 'email', 
             }}/>
             <TextField id="outlined-basic" required label="Telefon nr." name="Telefon" variant="outlined" />
           </div>
           </>
         ) : (
           <>
+            <Box sx={{ ml: 1 }} >
+            <Header title="Rotary Login" subtitle="" margin={'none'} />        
+            </Box>
             <TextField 
               id="outlined-basic" 
               label="Email" 

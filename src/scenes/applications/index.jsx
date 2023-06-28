@@ -43,12 +43,11 @@ const submitForm = (e, flag, app, user) => {
   switch (flag) {
     case "Gem":
       const data = {
+        appId: app.id,
         user: user,
         app: obj
       };
-
-      console.log(data)
-      postJson(`/uploadFile?id=${user.user_id}`, data).then((res) => {
+      postJson(`/saveApplication?id=${user.server_id}`, data).then((res) => {
         console.log(res);
         alert("Saved");
       });
@@ -56,6 +55,15 @@ const submitForm = (e, flag, app, user) => {
       break;
 
     case "Indsend":
+      const data2 = {
+        appId: app.id,
+        user: user,
+        app: obj
+      };
+      postJson(`/submitApplication?id=${user.server_id}`, data2).then((res) => {
+        console.log(res);
+        alert("Submitted");
+      });
 
       break;
 
@@ -73,8 +81,9 @@ const Apps = () => {
   const { user, setUser } = useContext(LoginContext);
   const [ activeApp, setActiveApp ] = useState(-1);
   const [ application, setApplication ] = useState({});
+  const [ awnsers, setAwnsers] = useState(null)
   const [ applications, setApplications ] = useState([]);
-  const [flag, setFlag] = useState("Indsend");
+  const [ flag, setFlag ] = useState("Indsend");
 
   const { reload, setReload } = useContext(ReloadContext);
   useEffect(() => {
@@ -98,10 +107,16 @@ const Apps = () => {
       getJson(`/getApplication?id=${activeApp}`)
       .then(res => {
         console.log(res);
-        setApplication(res);
+        getJson(`/getUserApplication?id=${user.server_id}&appid=${activeApp}&d=${Date.now()}`)
+        .then(appSaved => {
+          if (appSaved.status !== "Error") {
+            setAwnsers(appSaved);
+          }
+          setApplication(res);
+        });
       });
     } else {
-      getJson(`/getAllApplications?d=${Date.now()}`).then(res => {
+      getJson(`/getAllApplications?id=${user.server_id}&d=${Date.now()}`).then(res => {
         console.log(res);
         setApplications(res);
       });
@@ -130,7 +145,8 @@ const Apps = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {applications.map((row) => (
+                  {applications.map((row) => ( 
+                    (new Date(row.start.split(" ")[0]) < new Date() && new Date() < new Date(row.stop.split(" ")[0])) ? (
                     <TableRow
                       key={row.id}
                       sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -140,13 +156,14 @@ const Apps = () => {
                       <TableCell>{row.start.split(" ")[0]}</TableCell>
                       <TableCell>{row.stop.split(" ")[0]}</TableCell>
                     </TableRow>
+                  ) : (<></>)
                   ))}
                 </TableBody>
               </Table>
             </TableContainer>
           </> : <Box
               component="form"
-              onSubmit={(e) => {submitForm(e, flag, application)}}
+              onSubmit={(e) => {submitForm(e, flag, application, user)}}
             >
             <Header title={application.title} subtitle={application.subtitle} />        
             {application.desc.split("\n").map((text) => {
@@ -161,9 +178,9 @@ const Apps = () => {
             })}
             <Box mb={5} />
             <UserInfo />
-            {application.form.map(row => {
-              return <QuestioneerInput row={row} />
-            })}
+            {application.form !== undefined ? application.form.map(row => {
+              return <QuestioneerInput row={row} awnsers={awnsers} appId={application.id} />
+            }) : <></>}
             <Button 
               variant="contained" 
               type="submit"

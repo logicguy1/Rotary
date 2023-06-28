@@ -1,11 +1,12 @@
 import { Typography, Box, useTheme, TextField, MenuItem, Select } from "@mui/material";
+import { useRef, useEffect, useState } from 'react';
 import { tokens } from "../theme.js";
 
 const Title = ({ row }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  return row.required ? (
+  return !row.required ? (
     <Typography 
       variant="h6"
       color={colors.grey[100]}
@@ -16,7 +17,7 @@ const Title = ({ row }) => {
       {row.label !== "" ? row.label : " "}
     </Typography>  
   ) : (
-    <Box sx={{ width: 300, display: "flex" }}>
+    <Box sx={{ width: 300, display: "flex", pr: 2 }}>
       <Typography 
         variant="h6"
         color={colors.grey[100]}
@@ -37,11 +38,29 @@ const Title = ({ row }) => {
   )
 }
 
-const QuestioneerInput = ({ row }) => {
+const QuestioneerInput = ({ row, awnsers, appId }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
   const type = row.type;
+  const textFieldRef = useRef(null);
+  const [ dropdown, setDropdown ] = useState(row.type == "dropdown" ? row.choices[0] : "");
+
+  useEffect(() => {
+    if (appId != undefined && awnsers != null && awnsers[appId] != undefined && awnsers[appId].app[row.id] !== undefined) {
+      const defaultValue = awnsers[appId].app[row.id];
+      if (row.type !== "dropdown") {
+        textFieldRef.current.lastChild.children[0].value = awnsers[appId].app[row.id];
+      } else {
+        setDropdown(awnsers[appId].app[row.id])
+        //textFieldRef.current.children[1].value = awnsers[appId].app[row.id]
+      }
+    }   
+  }, [awnsers, appId])
+
+  const updateSelect = (e) => {
+    setDropdown(e.target.value);
+  }
 
   switch (type) {
     case "plaintext":
@@ -79,6 +98,7 @@ const QuestioneerInput = ({ row }) => {
               shrink: true,
             }}
             sx={{ width: 400 }}
+            ref={textFieldRef}
           />
 
         </Box>
@@ -101,6 +121,7 @@ const QuestioneerInput = ({ row }) => {
             rows={4}
             name={`inp${row.id}`}
             sx={{ width: 400 }}
+            ref={textFieldRef}
           />
         </Box>
       );
@@ -126,6 +147,8 @@ const QuestioneerInput = ({ row }) => {
             sx={{
               width: 200,
             }}
+            value={dropdown}
+            onChange={(e) => updateSelect(e)}
           >
             {row.choices.map(item => {
               return <MenuItem value={item}>{item}</MenuItem>

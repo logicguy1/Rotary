@@ -14,6 +14,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
+import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 
 import { LoginContext } from "../../../contexts/Login.js";
 import { ReloadContext } from "../../../contexts/Reload.js";
@@ -66,10 +67,13 @@ const save_changes = (form, setActiveApp, user) => {
 const addQuestion = (application, setApplication) => {
   console.log("ADD QUESTION", application)
   const tmpApp = JSON.parse(JSON.stringify(application));
+  if (tmpApp.form === undefined) {
+    tmpApp.form = [];
+  }
   tmpApp.form.push({
     "id": parseInt(Math.random()*1000000),
     "type": "text",
-    "label": "Nyt Spøgsmål",
+    "label": "",
     "required": true,
   })
   setApplication(tmpApp);
@@ -168,6 +172,31 @@ const AdminApps = () => {
       ...updatedvalue
     }))
   }
+
+  const handleCopy = (e) => {
+    const { location } = window;
+    navigator.clipboard.writeText(`https://${location.hostname}/login/${application.id}`)
+  }
+
+  const duplicate = (app) => {
+    const data = {
+      id: app.id,
+      token: user.auth
+    }
+    postJson("/duplicateApplication", data).then(res => {
+      setActiveApp(res.appId);
+    })
+  }
+
+  const deleteApp = (app) => {
+    const data = {
+      id: app.id,
+      token: user.auth
+    }
+    postJson("/deleteApplication", data).then(res => {
+      setActiveApp(-1);
+    })
+  }
   // Handle namechange modals
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -231,6 +260,12 @@ const AdminApps = () => {
               >
                 <CreateOutlinedIcon />
               </IconButton>
+              <IconButton 
+                onClick={handleCopy} 
+                sx={{ width: 35, height: 35, ml: 1, mt: "44px" }}
+              >
+                <ContentCopyOutlinedIcon />
+              </IconButton>
             </Box>
 
             <Box
@@ -287,9 +322,9 @@ const AdminApps = () => {
               <DatePicker label="Slut dato" value={dayjs(application.stop)} onChange={e => (update_stop(e["$D"], e["$M"]+1, e["$y"]))} />
             </Box>
 
-            {application.form.map(row => {
+            {application.form !== undefined ? application.form.map(row => {
               return <AdminQuestioneerInput row={row} application={application} setApplication={setApplication} />
-            })}
+            }) : (<></>)}
             <Button 
               variant="contained" 
               size="large" 
@@ -304,6 +339,20 @@ const AdminApps = () => {
               sx={{ mt: 1, ml: 1, width: '26ch'}}
               onClick={(e) => {addQuestion(application, setApplication)}}
             >Tilføj Spørgsmål</Button>
+            <Button 
+              variant="contained" 
+              size="large" 
+              color="info"
+              sx={{ mt: 1, ml: 1, width: '16ch'}}
+              onClick={(e) => {duplicate(application)}}
+            >Dupliker</Button>
+            <Button 
+              variant="contained" 
+              size="large" 
+              color="error"
+              sx={{ mt: 1, ml: 1, width: '16ch'}}
+              onClick={(e) => {deleteApp(application)}}
+            >Slet</Button>
 
 
 
