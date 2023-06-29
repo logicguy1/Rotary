@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme, TextField, IconButton, Modal } from "@mui/material";
+import { Box, Typography, useTheme, TextField, IconButton, Modal, Select, MenuItem } from "@mui/material";
 import Button, { ButtonProps } from '@mui/material/Button';
 import { tokens } from "../../../theme";
 import { useContext, useState, useEffect } from "react";
@@ -87,6 +87,7 @@ const AdminApps = () => {
   const [ activeApp, setActiveApp ] = useState(-1);
   const [ application, setApplication ] = useState({});
   const [ applications, setApplications ] = useState([]);
+  const [ fonds, setFonds ] = useState([]);
   const [ flag, setFlag ] = useState("Indsend");
 
   useEffect(() => {
@@ -111,6 +112,11 @@ const AdminApps = () => {
 
         setApplication(res);
       });
+
+      getJson(`/getFonds?d=${Date.now()}`).then(res => {
+        console.log(res)
+        setFonds(res)
+      })
     } else {
       getJson(`/getAllApplications?d=${Date.now()}`).then(res => {
         console.log(res);
@@ -118,6 +124,7 @@ const AdminApps = () => {
       });
     }
   }, [activeApp])
+
 
   const { reload, setReload } = useContext(ReloadContext);
   useEffect(() => {
@@ -173,6 +180,14 @@ const AdminApps = () => {
     }))
   }
 
+  const update_fond = (id) => {
+    let updatedvalue = {fond_id: id};
+    setApplication(application => ({
+      ...application,
+      ...updatedvalue
+    }))
+  }
+
   const handleCopy = (e) => {
     const { location } = window;
     navigator.clipboard.writeText(`https://${location.hostname}/login/${application.id}`)
@@ -218,6 +233,7 @@ const AdminApps = () => {
               <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                 <TableHead>
                   <TableRow>
+                    <TableCell>ID</TableCell>
                     <TableCell>Navn</TableCell>
                     <TableCell>Start dato</TableCell>
                     <TableCell>Slut dato</TableCell>
@@ -230,6 +246,7 @@ const AdminApps = () => {
                       sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                       onClick={(e) => {setActiveApp(row.id)}}
                     >
+                      <TableCell>{row.id}</TableCell>
                       <TableCell>{row.title}</TableCell>
                       <TableCell>{row.start.split(" ")[0]}</TableCell>
                       <TableCell>{row.stop.split(" ")[0]}</TableCell>
@@ -290,6 +307,26 @@ const AdminApps = () => {
               />
             </Box>
 
+            <Box
+              flexDirection="row"
+              display="flex"
+              mb={2}
+              pt={2}
+              borderTop={`2px solid ${colors.primary[400]}`}
+            >
+              <Select
+                name="fond-dropdown"
+                sx={{
+                  width: 400,
+                }}
+                value={application.fond_id}
+                onChange={(e) => update_fond(e.target.value)}
+              >
+                {fonds.map(item => {
+                  return <MenuItem value={item.id}>{item.name}</MenuItem>
+                })}
+              </Select>
+            </Box>
             <Box
               flexDirection="row"
               display="flex"

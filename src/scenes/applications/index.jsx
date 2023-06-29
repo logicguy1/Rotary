@@ -1,7 +1,7 @@
-import { Box, Typography, useTheme, TextField } from "@mui/material";
+import { Box, Typography, useTheme, TextField, Snackbar, IconButton } from "@mui/material";
 import Button, { ButtonProps } from '@mui/material/Button';
 import { tokens } from "../../theme";
-import { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { Navigate, useParams } from "react-router-dom";
 
 import Table from '@mui/material/Table';
@@ -12,6 +12,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
+import CloseIcon from '@mui/icons-material/Close';
+
 import { LoginContext } from "../../contexts/Login.js";
 import { ReloadContext } from "../../contexts/Reload.js";
 
@@ -21,56 +23,8 @@ import { getJson, postJson } from "../../data/dataHook.js";
 import Header from "../../components/Header";
 import QuestioneerInput from "../../components/QuestioneerInput";
 import UserInfo from "../../components/UserInfo";
+import TextComponent from "../../components/TextComponent";
 
-const submitForm = (e, flag, app, user) => {
-  e.preventDefault();
-  console.log(e, flag);
-  // TODO: Save output data
-
-  // Isolate the application fields with data in them
-  let filtered = app.form.filter((item) => {
-    return !["plaintext"].includes(item.type);
-  });
-  
-  let res = filtered.map((item) => {
-    return [item.id, e.target[`inp${item.id}`].value]
-  });
-  let obj = Object.fromEntries(res);
-  console.log(obj);
-
-  // Obj er et objekt hvor keys er id og value er svar, brug når der skal gemmes 
-
-  switch (flag) {
-    case "Gem":
-      const data = {
-        appId: app.id,
-        user: user,
-        app: obj
-      };
-      postJson(`/saveApplication?id=${user.server_id}`, data).then((res) => {
-        console.log(res);
-        alert("Saved");
-      });
-      
-      break;
-
-    case "Indsend":
-      const data2 = {
-        appId: app.id,
-        user: user,
-        app: obj
-      };
-      postJson(`/submitApplication?id=${user.server_id}`, data2).then((res) => {
-        console.log(res);
-        alert("Submitted");
-      });
-
-      break;
-
-    default:
-      break;
-  }
-}
 
 const Apps = () => {
   const theme = useTheme();
@@ -83,7 +37,94 @@ const Apps = () => {
   const [ application, setApplication ] = useState({});
   const [ awnsers, setAwnsers] = useState(null)
   const [ applications, setApplications ] = useState([]);
+  const [ snackbarMsg, setSnackbarMsg ] = useState([]);
   const [ flag, setFlag ] = useState("Indsend");
+
+  const [open, setOpen] = useState(false);
+  const fromRef = useRef(null)
+
+  const handleClick = () => {
+    setOpen(true);
+  };
+  
+  const handleClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+  const action = (
+    <React.Fragment>
+      <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={handleClose}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </React.Fragment>
+  );
+
+  const submitForm = (e, flag, app, user) => {
+    e.preventDefault();
+    console.log(e, flag);
+
+    if (flag == "Gem") {
+      var form = fromRef.current
+    } else {
+      var form = e.target
+    }
+
+    // Isolate the application fields with data in them
+    let filtered = app.form.filter((item) => {
+      return !["plaintext"].includes(item.type);
+    });
+    
+    let res = filtered.map((item) => {
+      return [item.id, form[`inp${item.id}`].value]
+    });
+    let obj = Object.fromEntries(res);
+    console.log(obj);
+
+    // Obj er et objekt hvor keys er id og value er svar, brug når der skal gemmes 
+
+    switch (flag) {
+      case "Gem":
+        const data = {
+          appId: app.id,
+          user: user,
+          app: obj
+        };
+        postJson(`/saveApplication?id=${user.server_id}`, data).then((res) => {
+          console.log(res);
+          setSnackbarMsg("Din ansøgning / tilmælding er blevet gemt.")
+          setOpen(true);
+        });
+        
+        break;
+
+      case "Indsend":
+        const data2 = {
+          appId: app.id,
+          user: user,
+          app: obj
+        };
+        postJson(`/submitApplication?id=${user.server_id}`, data2).then((res) => {
+          console.log(res);
+          setSnackbarMsg("Din ansøgning / tilmælding er blevet indsendt.")
+          setOpen(true);
+        });
+
+        break;
+
+      default:
+        break;
+    }
+  }
+
 
   const { reload, setReload } = useContext(ReloadContext);
   useEffect(() => {
@@ -104,7 +145,7 @@ const Apps = () => {
     console.log("THIS IS THE ACTIVE APP", activeApp);
 
     if (activeApp != undefined && activeApp != -1) {
-      getJson(`/getApplication?id=${activeApp}`)
+      getJson(`/getApplication?id=${activeApp}&d=${Date.now()}`)
       .then(res => {
         console.log(res);
         getJson(`/getUserApplication?id=${user.server_id}&appid=${activeApp}&d=${Date.now()}`)
@@ -131,6 +172,13 @@ const Apps = () => {
         '& .MuiTableBody-root .MuiTableCell-root': { cursor: 'pointer' }
       }}
     >
+    <Snackbar
+      open={open}
+      autoHideDuration={6000}
+      onClose={handleClose}
+      message={snackbarMsg}
+      action={action}
+    />
       {
         activeApp == -1 ?
           <>
@@ -164,18 +212,10 @@ const Apps = () => {
           </> : <Box
               component="form"
               onSubmit={(e) => {submitForm(e, flag, application, user)}}
+              ref={fromRef}
             >
             <Header title={application.title} subtitle={application.subtitle} />        
-            {application.desc.split("\n").map((text) => {
-              return (
-                <Typography 
-                  variant="h6"
-                  color={colors.grey[100]}
-                >
-                  {text != "" ? text : " "}
-                </Typography>  
-              )
-            })}
+            <TextComponent text={application.desc} />
             <Box mb={5} />
             <UserInfo />
             {application.form !== undefined ? application.form.map(row => {
@@ -191,11 +231,10 @@ const Apps = () => {
             >Indsend</Button>
             <Button 
               variant="contained" 
-              type="submit"
               size="large" 
               color="info"
               sx={{ mt: 1, ml: 1, width: '16ch'}}
-              onClick={(e) => {setFlag("Gem")}}
+              onClick={(e) => {setFlag("Gem"); submitForm(e, flag, application, user)}}
             >Gem</Button>
           </Box>
       }

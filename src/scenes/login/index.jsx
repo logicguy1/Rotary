@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme, TextField } from "@mui/material";
+import { Box, Typography, useTheme, TextField, Modal } from "@mui/material";
 import Button, { ButtonProps } from '@mui/material/Button';
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -12,6 +12,7 @@ import { getJson, postJson } from "../../data/dataHook.js";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import Header from "../../components/Header";
+import TextComponent from "../../components/TextComponent";
 
 const onSubmitLogin = (e, setUser, isAdmin, setError) => {
   e.preventDefault();
@@ -64,10 +65,19 @@ const Login = () => {
   const colors = tokens(theme.palette.mode);
 
   const { user, setUser } = useContext(LoginContext);
+
   const [ title, setTitle ] = useState("Rotary Login")
   const [ subtitle, setSubtitle ] = useState("")
+  const [ start, setStart ] = useState(null)
+  const [ stop, setStop ] = useState(null)
+  const [ modalText, setModalText ] = useState("")
+
   const [ isAdmin, setIsAdmin ] = useState(false);
   const [ error, setError ] = useState("");
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   let { id } = useParams();
 
@@ -75,11 +85,22 @@ const Login = () => {
     // TODO: use the id to fetch title and set title using setTitle
     if (id !== -1 && id != undefined) {
       console.log("IT IS NOT UNDEFINED", id)
-      getJson(`/getApplication?id=${id}`)
+      getJson(`/getApplication?id=${id}&d=${Date.now()}`)
       .then(res => {
         console.log(res, res.subtitle)
         setTitle(res.title);
         setSubtitle(res.subtitle);
+        setStop(res.start);
+        setStop(res.stop);
+        console.log(Date(res.start))
+        // if (true) {
+        if (new Date(res.start.split(" ")[0]) > new Date()) {
+          setModalText(`<Big>Ansøgning / tilmælding starter den (${res.start.split(' ')[0]})</Big>`);
+          setOpen(true);
+        } else if (new Date(res.stop.split(" ")[0]) < new Date()) {
+          setModalText(`<Big>Ansøngninsfristen var overskrevet den ${res.start.split(' ')[0]}, kontakt evnt Juat Hartoft, mail: just@hartoft.dk</Big>`);
+          setOpen(true);
+        }
       });
     } else {
       console.log("IT IS UNDEFINED", id)
@@ -122,9 +143,7 @@ const Login = () => {
             <TextField id="outlined-basic" required label="Klub" name="Klub" variant="outlined" />
           </div>
           <div>
-            <TextField id="outlined-basic" required label="Email" name="Email" variant="outlined" inputProps={{
-              inputMode: 'email', 
-            }}/>
+            <TextField id="outlined-basic" required label="Email" name="Email" variant="outlined" />
             <TextField id="outlined-basic" required label="Telefon nr." name="Telefon" variant="outlined" />
           </div>
           </>
@@ -185,6 +204,26 @@ const Login = () => {
         </Box>
         
       </Box>
+      <Modal
+        open={open}
+        onClose={e => {console.log(e)}}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={{
+          backgroundColor: colors.primary[400],
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 570,
+          border: '2px solid #000',
+          boxShadow: 24,
+          p: 4,
+        }}>
+          <TextComponent text={modalText} />
+        </Box>
+      </Modal>
     </Box>
   )
 }
