@@ -149,7 +149,7 @@ const Login = () => {
           </>
         ) : (
           <>
-            <Box sx={{ ml: 1 }} >
+            <Box sx={{ ml: 1, mr: 1 }} >
             <Header title="Rotary Login" subtitle="" margin={'none'} />        
             </Box>
             <TextField 

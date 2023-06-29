@@ -315,15 +315,16 @@ const AdminApps = () => {
               borderTop={`2px solid ${colors.primary[400]}`}
             >
               <Select
-                name="fond-dropdown"
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
                 sx={{
-                  width: 400,
+                  width: 700,
                 }}
-                value={application.fond_id}
+                value={application.fond_id || ''}
                 onChange={(e) => update_fond(e.target.value)}
               >
                 {fonds.map(item => {
-                  return <MenuItem value={item.id}>{item.name}</MenuItem>
+                  return <MenuItem value={item.id} key={item.id}>{item.name}</MenuItem>
                 })}
               </Select>
             </Box>
