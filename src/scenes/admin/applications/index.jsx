@@ -34,7 +34,6 @@ const createNewForm = (user, setActiveApp) => {
   let year = date.getFullYear();
 
   let currentDate = `${month}/${day}/${year}`;
-
   const data = {
     title: "Ny ansøgning",
     subtitle: "",
@@ -125,7 +124,6 @@ const AdminApps = () => {
     }
   }, [activeApp])
 
-
   const { reload, setReload } = useContext(ReloadContext);
   useEffect(() => {
     setActiveApp(-1);
@@ -133,59 +131,64 @@ const AdminApps = () => {
   }, [reload])
 
   const update = (value) => {
-    let updatedValue = {title: value};
-    setApplication(application => ({
-      ...application,
-      ...updatedValue
-    }))
+    setApplication(prevState => ({
+      ...prevState,
+      title: value
+    }));
   }
 
   const update_sub = (value) => {
-    let updatedValue = {subtitle: value};
-    setApplication(application => ({
-      ...application,
-      ...updatedValue
-    }))
+    setApplication(prevState => ({
+      ...prevState,
+      subtitle: value
+    }));
   }
 
   const update_desc = (e) => {
-    let updatedValue = {desc: e.target.value};
-    setApplication(application => ({
-      ...application,
-      ...updatedValue
-    }))
+    const value = e.target.value;
+    setApplication(prevState => ({
+      ...prevState,
+      desc: value
+    }));
   }
 
   const update_email = (e) => {
-    let updatedvalue = {mail: e.target.value};
-    setApplication(application => ({
-      ...application,
-      ...updatedvalue
-    }))
+    const value = e.target.value;
+    setApplication(prevState => ({
+      ...prevState,
+      mail: value
+    }));
+  }
+
+  const updateCount = (e) => {
+    const value = e.target.value;
+    setApplication(prevState => ({
+      ...prevState,
+      count: value
+    }));
   }
 
   const update_start = (day, month, year) => {
-    let updatedvalue = {start: `${year}-${month}-${day}`};
-    setApplication(application => ({
-      ...application,
-      ...updatedvalue
-    }))
+    const formattedDate = `${year}-${month}-${day}`;
+    setApplication(prevState => ({
+      ...prevState,
+      stop: formattedDate
+    }));
   }
 
   const update_stop = (day, month, year) => {
-    let updatedvalue = {stop: `${year}-${month}-${day}`};
-    setApplication(application => ({
-      ...application,
-      ...updatedvalue
-    }))
+    const formattedDate = `${year}-${month}-${day}`;
+    setApplication(prevState => ({
+      ...prevState,
+      stop: formattedDate
+    }));
   }
 
   const update_fond = (id) => {
-    let updatedvalue = {fond_id: id};
-    setApplication(application => ({
-      ...application,
-      ...updatedvalue
-    }))
+    setApplication(prevState => ({
+      ...prevState,
+      fond_id: id
+    }));
   }
 
   const handleCopy = (e) => {
@@ -348,14 +351,26 @@ const AdminApps = () => {
               />
             </Box>
 
-            <Box
+            
+              <TextField
+                variant="outlined"
+                name="count"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                sx={{ width: 700, mr: 1 }}
+                label="Sendte ansøgninger"
+                value={application.count}
+                onChange={e => (updateCount(e))}
+              />
+              <Box
               flexDirection="row"
               display="flex"
               mb={2}
               pt={2}
               borderTop={`2px solid ${colors.primary[400]}`}
               gap={2}
-            >
+              >
               <DatePicker label="Start dato" value={dayjs(application.start)} onChange={e => (update_start(e["$D"], e["$M"]+1, e["$y"]))} />
               <DatePicker label="Slut dato" value={dayjs(application.stop)} onChange={e => (update_stop(e["$D"], e["$M"]+1, e["$y"]))} />
             </Box>
