@@ -138,21 +138,47 @@ const Login = () => {
           <Box sx={{ ml: 1 }} >
             <Header title={title} subtitle={subtitle} margin={'none'} />        
           </Box>
+          { title === "Rotary Login" ? (
+            <></>
+          ) : (
+              <Typography 
+                variant="h4"
+                color={colors.redAccent[400]}
+                sx={{ ml: 1, mb: 1 }}
+              >
+                Hvis du har gemt og ikke lavet en ansøgning færdig, vil du kunne kalde ansøgningen frem ved blot at skrive dit medlemsnummer og trykke på login 
+              </Typography>  
+          )}
           <div>
             <TextField id="outlined-basic" required label="Medlemsnummer" name="Medlemsnummer" variant="outlined" inputProps={{
               inputMode: 'numeric', 
               pattern: '[0-9]*', 
             }} />
-            <TextField id="outlined-basic" required label="Navn" name="Navn" variant="outlined" />
+            <TextField id="outlined-basic" label="Navn" name="Navn" variant="outlined" />
           </div>
-          <div>
-            <TextField id="outlined-basic" required label="Distrikt" name="Distrikt" variant="outlined" />
-            <TextField id="outlined-basic" required label="Klub" name="Klub" variant="outlined" />
-          </div>
-          <div>
-            <TextField id="outlined-basic" required label="Email" name="Email" variant="outlined" />
-            <TextField id="outlined-basic" required label="Telefon nr." name="Telefon" variant="outlined" />
-          </div>
+            { title === "Rotary Login" ? (
+              <>
+              <div>
+                <TextField id="outlined-basic" required label="Distrikt" name="Distrikt" variant="outlined" />
+                <TextField id="outlined-basic" required label="Klub" name="Klub" variant="outlined" />
+              </div>
+              <div>
+                <TextField id="outlined-basic" required label="Email" name="Email" variant="outlined" />
+                <TextField id="outlined-basic" required label="Telefon nr." name="Telefon" variant="outlined" />
+              </div>
+              </>
+            ) : (
+              <>
+              <div>
+                <TextField id="outlined-basic" label="Distrikt" name="Distrikt" variant="outlined" />
+                <TextField id="outlined-basic" label="Klub" name="Klub" variant="outlined" />
+              </div>
+              <div>
+                <TextField id="outlined-basic" label="Email" name="Email" variant="outlined" />
+                <TextField id="outlined-basic" label="Telefon nr." name="Telefon" variant="outlined" />
+              </div>
+              </>
+            )}
           </>
         ) : (
           <>

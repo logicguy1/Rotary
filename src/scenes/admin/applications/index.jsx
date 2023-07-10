@@ -13,6 +13,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
+import CloseIcon from '@mui/icons-material/Close';
+
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 
@@ -21,6 +23,7 @@ import { ReloadContext } from "../../../contexts/Reload.js";
 
 import { application_tmp } from "../../../data/mockData.js";
 
+import AlertDialog from '../../../components/ConfirmDialog';
 import Header from "../../../components/Header";
 import AdminQuestioneerInput from "../../../components/AdminQuestioneerInput";
 
@@ -58,13 +61,12 @@ const createNewForm = (user, setActiveApp) => {
 
 const save_changes = (form, setActiveApp, user) => {
   postJson("/updateApplication", { ...form, token: user.auth }).then(res => {
-    console.log(res);
-    setActiveApp(-1);
+    alert("Gemt");
+    // setActiveApp(-1);
   });
 }
 
 const addQuestion = (application, setApplication) => {
-  console.log("ADD QUESTION", application)
   const tmpApp = JSON.parse(JSON.stringify(application));
   if (tmpApp.form === undefined) {
     tmpApp.form = [];
@@ -89,12 +91,30 @@ const AdminApps = () => {
   const [ fonds, setFonds ] = useState([]);
   const [ flag, setFlag ] = useState("Indsend");
 
+  const [confirm, setConfirm] = useState(false)
+
+  const [title, setTitle] = useState("");
+  const [subTitle, setSubTitle] = useState("");
+  const [desc, setDesc] = useState("");
+  const [mail, setMail] = useState("");
+  const [count, setCount] = useState("");
+
+  useEffect(() => {
+    if (confirm) {
+      deleteApp(application);
+      setConfirm(false);
+    }
+  }, [confirm]);
+
   useEffect(() => {
     setApplication(application_tmp);
     if (activeApp != -1 || activeApp == undefined) {
-      console.log("Calling active app", activeApp)
+
+      getJson(`/getFonds?d=${Date.now()}`).then(res => {
+        setFonds(res)
+      })
+
       getJson(`/getApplication?id=${activeApp}&d=${Date.now()}`).then(res => {
-        console.log(res);
 
         let date = new Date(res.start);
         let day = date.getDate();
@@ -107,18 +127,16 @@ const AdminApps = () => {
         month = date.getMonth() + 1;
         year = date.getFullYear();
         res.stop = `${month}/${day}/${year}`;
-        console.log(res);
 
         setApplication(res);
+        setTitle(res.title);
+        setSubTitle(res.subtitle);
+        setDesc(res.desc);
+        setMail(res.mail);
+        setCount(res.count);
       });
-
-      getJson(`/getFonds?d=${Date.now()}`).then(res => {
-        console.log(res)
-        setFonds(res)
-      })
     } else {
       getJson(`/getAllApplications?d=${Date.now()}`).then(res => {
-        console.log(res);
         setApplications(res);
       });
     }
@@ -130,42 +148,35 @@ const AdminApps = () => {
     setReload(false);
   }, [reload])
 
-  const update = (value) => {
+  const update_app = () => {
     setApplication(prevState => ({
       ...prevState,
-      title: value
+      title: title,
+      subtitle: subTitle,
+      desc: desc,
+      mail: mail,
+      count: count
     }));
+  }
+
+  const update = (value) => {
+    setTitle(value);
   }
 
   const update_sub = (value) => {
-    setApplication(prevState => ({
-      ...prevState,
-      subtitle: value
-    }));
+    setSubTitle(value);
   }
 
   const update_desc = (e) => {
-    const value = e.target.value;
-    setApplication(prevState => ({
-      ...prevState,
-      desc: value
-    }));
+    setDesc(e.target.value);
   }
 
   const update_email = (e) => {
-    const value = e.target.value;
-    setApplication(prevState => ({
-      ...prevState,
-      mail: value
-    }));
-  }
+    setMail(e.target.value);
+  } 
 
   const updateCount = (e) => {
-    const value = e.target.value;
-    setApplication(prevState => ({
-      ...prevState,
-      count: value
-    }));
+    setCount(e.target.value);
   }
 
   const update_start = (day, month, year) => {
@@ -191,7 +202,7 @@ const AdminApps = () => {
     }));
   }
 
-  const handleCopy = (e) => {
+  const handleCopy = () => {
     const { location } = window;
     navigator.clipboard.writeText(`https://${location.hostname}/login?id=${application.id}`)
   }
@@ -264,7 +275,7 @@ const AdminApps = () => {
               size="large" 
               color="info"
               sx={{ mt: 1, width: '16ch'}}
-              onClick={e => (createNewForm(user, setActiveApp))}
+              onClick={() => (createNewForm(user, setActiveApp))}
             >Tilføj ny</Button>
           </> : <Box
               component="form"
@@ -273,7 +284,7 @@ const AdminApps = () => {
               flexDirection="row"
               display="flex"
             >
-              <Header title={application.title} subtitle={application.subtitle} />        
+              <Header title={title} subtitle={subTitle} />        
               <IconButton 
                 onClick={handleOpen} 
                 sx={{ width: 35, height: 35, ml: 1, mt: "44px" }}
@@ -305,8 +316,9 @@ const AdminApps = () => {
                 rows={5}
                 sx={{ width: 700, mr: 1 }}
                 label="Beskrivelse"
-                value={application.desc}
+                value={desc}
                 onChange={e => (update_desc(e))}
+                onBlur={e => update_app(e)}
               />
             </Box>
 
@@ -346,8 +358,9 @@ const AdminApps = () => {
                 }}
                 sx={{ width: 700, mr: 1 }}
                 label="Emails, seperet af et komma"
-                value={application.mail}
+                value={mail}
                 onChange={e => (update_email(e))}
+                onBlur={e => update_app(e)}
               />
             </Box>
 
@@ -360,23 +373,24 @@ const AdminApps = () => {
                 }}
                 sx={{ width: 700, mr: 1 }}
                 label="Sendte ansøgninger"
-                value={application.count}
+                value={count}
                 onChange={e => (updateCount(e))}
+                onBlur={e => update_app(e)}
               />
               <Box
-              flexDirection="row"
-              display="flex"
-              mb={2}
-              pt={2}
-              borderTop={`2px solid ${colors.primary[400]}`}
-              gap={2}
+                flexDirection="row"
+                display="flex"
+                mb={2}
+                pt={2}
+                borderTop={`2px solid ${colors.primary[400]}`}
+                gap={2}
               >
               <DatePicker label="Start dato" value={dayjs(application.start)} onChange={e => (update_start(e["$D"], e["$M"]+1, e["$y"]))} />
               <DatePicker label="Slut dato" value={dayjs(application.stop)} onChange={e => (update_stop(e["$D"], e["$M"]+1, e["$y"]))} />
             </Box>
 
             {application.form !== undefined ? application.form.map(row => {
-              return <AdminQuestioneerInput row={row} application={application} setApplication={setApplication} />
+              return <AdminQuestioneerInput key={row.id} row={row} application={application} setApplication={setApplication} />
             }) : (<></>)}
             <Button 
               variant="contained" 
@@ -399,15 +413,11 @@ const AdminApps = () => {
               sx={{ mt: 1, ml: 1, width: '16ch'}}
               onClick={(e) => {duplicate(application)}}
             >Dupliker</Button>
-            <Button 
-              variant="contained" 
-              size="large" 
-              color="error"
-              sx={{ mt: 1, ml: 1, width: '16ch'}}
-              onClick={(e) => {deleteApp(application)}}
-            >Slet</Button>
-
-
+            <AlertDialog 
+              title={"Er du sikker?"} 
+              text={"Ansøgningen kan ikke genskabes når den først er slettet"} 
+              setConfirm={setConfirm} 
+            />
 
           <Modal
               open={open}
@@ -435,7 +445,8 @@ const AdminApps = () => {
                   onChange={(e) => {update(e.target.value)}}
                   sx={{ width: 500, mr: 1 }}
                   label="Titel"
-                  value={application.title}
+                  value={title}
+                  onBlur={e => update_app(e)}
                 />
                 <Box mb={3}></Box>
                 <TextField
@@ -447,7 +458,8 @@ const AdminApps = () => {
                   onChange={(e) => {update_sub(e.target.value)}}
                   sx={{ width: 500, mr: 1 }}
                   label="Undertitel"
-                  value={application.subtitle}
+                  value={subTitle}
+                  onBlur={e => update_app(e)}
                 />
                   <Button 
                     variant="contained" 

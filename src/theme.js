@@ -130,15 +130,15 @@ export const themeSettings = (mode) => {
         ? {
             // palette values for dark mode
             primary: {
-              main: colors.primary[500],
+              main: colors.primary[100],
             },
             secondary: {
               main: colors.greenAccent[500],
             },
             neutral: {
-              dark: colors.grey[700],
-              main: colors.grey[500],
-              light: colors.grey[100],
+              dark: colors.primary[100],
+              main: colors.primary[500],
+              light: colors.primary[700],
             },
             background: {
               default: colors.primary[500],
@@ -190,6 +190,17 @@ export const themeSettings = (mode) => {
         fontSize: 14,
       },
     },
+    components: {
+      // Name of the component
+      MuiDialog: {
+        styleOverrides: {
+          // Name of the slot
+          paper: {
+            backgroundColor: mode === "dark" ? colors.primary[700] : colors.primary[400], // Replace with your desired background color
+          },
+        },
+      },
+    },
   };
 };
 
@@ -199,7 +210,7 @@ export const ColorModeContext = createContext({
 })
 
 export const useMode = () => {
-  const [mode, setMode] = useState("light")
+  const [mode, setMode] = useState("dark")
 
   const colorMode = useMemo(
     () => ({

@@ -43,10 +43,10 @@ const Apps = () => {
   const [ application, setApplication ] = useState({});
   const [ awnsers, setAwnsers] = useState(null)
   const [ applications, setApplications ] = useState([]);
-  const [ snackbarMsg, setSnackbarMsg ] = useState([]);
   const [ flag, setFlag ] = useState("Indsend");
 
   const [open, setOpen] = useState(false);
+  const [ snackbarMsg, setSnackbarMsg ] = useState([]);
   const fromRef = useRef(null)
 
   const handleClick = () => {
@@ -122,6 +122,8 @@ const Apps = () => {
           console.log(res);
           setSnackbarMsg("Din ansøgning / tilmælding er blevet indsendt.")
           setOpen(true);
+        
+          window.location = "www.rotary.dk";
         });
 
         break;
@@ -158,6 +160,7 @@ const Apps = () => {
         .then(appSaved => {
           if (appSaved.status !== "Error") {
             setAwnsers(appSaved);
+            console.log("NOTEICE ME", appSaved);
           }
           setApplication(res);
         });

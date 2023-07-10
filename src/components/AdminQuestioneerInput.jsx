@@ -1,8 +1,8 @@
-import { Typography, Box, useTheme, TextField, MenuItem, Select, Checkbox, FormControlLabel, IconButton } from "@mui/material";
+import { Typography, Box, useTheme, TextField, MenuItem, Select, Checkbox, FormControlLabel, IconButton, Button } from "@mui/material";
 import { tokens } from "../theme.js";
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { MuiChipsInput } from 'mui-chips-input'
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const AwnserEnd = ({ checkState, rowId, disableCheck, application, setApplication }) => {
 
@@ -25,6 +25,17 @@ const AwnserEnd = ({ checkState, rowId, disableCheck, application, setApplicatio
         setApplication(tmpApp);
       }
     }
+  }
+  const addNewBelow = () => {
+    const updatedForm = [...application.form]; // Create a new copy of the form array
+
+    for (let i = 0; i < application.form.length; i++) {
+      if (application.form[i].id === rowId) {
+        updatedForm.splice(i+1, 0, { type: "text", label: "", id: Math.floor(Math.random() * 10000), required: false });
+        break;
+      }
+    }
+    setApplication({ ...application, form: updatedForm }); // Update the state with the new form array
   }
 
   return (
@@ -52,6 +63,13 @@ const AwnserEnd = ({ checkState, rowId, disableCheck, application, setApplicatio
         }
         label="Slet spøgsmål"
       />
+      <Button 
+        variant="contained" 
+        size="large" 
+        color="inherit"
+        sx={{ ml: 2, mt: 1, width: '26ch' }}
+        onClick={() => (addNewBelow())}
+      >Indsæt ny under</Button>
     </Box>
   );
 }
@@ -61,9 +79,22 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
   const colors = tokens(theme.palette.mode);
 
   const type = row.type;
+  const [inputValue, setInputValue] = useState(row.label);
+  const [updateApplication, setUpdateApplication] = useState(false);
+
+  useEffect(() => {
+    for (let i = 0; i < application.form.length; i++) {
+      if (application.form[i].id === row.id) {
+
+        let tmpApp = { ...application };
+        tmpApp.form[i].label = inputValue;
+        setApplication(tmpApp);
+      }
+    }
+    setUpdateApplication(false);
+  }, [updateApplication])
 
   const selectChange = (rowId, value) => {
-    console.log(rowId, value);
     for (let i = 0; i < application.form.length; i++) {
       if (application.form[i].id === rowId) {
 
@@ -75,7 +106,6 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
   }
 
   const handleChange = (newChips) => {
-    console.log(newChips)
     for (let i = 0; i < application.form.length; i++) {
       if (application.form[i].id === row.id) {
 
@@ -87,14 +117,7 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
   }
 
   const updateInput = (e, rowid) => {
-    for (let i = 0; i < application.form.length; i++) {
-      if (application.form[i].id === rowid) {
-
-        let tmpApp = { ...application };
-        tmpApp.form[i].label = e.target.value;
-        setApplication(tmpApp);
-      }
-    }
+    setInputValue(e.target.value);
   }
 
   switch (type) {
@@ -117,8 +140,9 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
             rows={2}
             sx={{ width: 299, mr: 1 }}
             placeholder="Nyt spøgsmål"
-            value={row.label}
+            value={inputValue}
             onChange={e => (updateInput(e, row.id))}
+            onBlur={() => (setUpdateApplication(true))}
           />
           <Select
             labelId="demo-simple-select-label"
@@ -158,8 +182,9 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
             rows={2}
             sx={{ width: 299, mr: 1 }}
             placeholder="Nyt spøgsmål"
-            value={row.label}
+            value={inputValue}
             onChange={e => (updateInput(e, row.id))}
+            onBlur={() => (setUpdateApplication(true))}
           />
           
 
@@ -201,8 +226,9 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
             rows={2}
             sx={{ width: 299, mr: 1 }}
             placeholder="Nyt spøgsmål"
-            value={row.label}
+            value={inputValue}
             onChange={e => (updateInput(e, row.id))}
+            onBlur={() => (setUpdateApplication(true))}
           />
 
           <Select
@@ -247,9 +273,10 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
               multiline
               rows={2}
               sx={{ width: 299, mr: 1 }}
-            placeholder="Nyt spøgsmål"
-              value={row.label}
+              placeholder="Nyt spøgsmål"
+              value={inputValue}
               onChange={e => (updateInput(e, row.id))}
+              onBlur={() => (setUpdateApplication(true))}
             />
 
 

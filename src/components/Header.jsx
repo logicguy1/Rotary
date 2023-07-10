@@ -10,13 +10,13 @@ const Header = ({ title, subtitle, margin }) => {
         variant="h2"
         color={colors.grey[100]}
         fontWeight="bold"
-        sx={{ m: margin !== "none" ? "40px 0 5px 0" : "0 0 5px 0" }}
+        sx={{ m: margin !== "none" ? "40px 0 15px 0" : "0 0 15px 0" }}
       >
         {title}
       </Typography>  
       <Typography
-        varient="h5"
-        color={colors.greenAccent[400]}
+        varient="h4"
+        sx={{ fontSize: 17 }}
       >{subtitle}</Typography>  
     </Box>
   );
