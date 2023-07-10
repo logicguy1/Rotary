@@ -193,7 +193,7 @@ const AdminApps = () => {
 
   const handleCopy = (e) => {
     const { location } = window;
-    navigator.clipboard.writeText(`https://${location.hostname}/login/${application.id}`)
+    navigator.clipboard.writeText(`https://${location.hostname}/login?id=${application.id}`)
   }
 
   const duplicate = (app) => {

@@ -13,6 +13,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import Header from "../../components/Header";
 import TextComponent from "../../components/TextComponent";
+import { useLocation } from 'react-router-dom';
 
 const onSubmitLogin = (e, setUser, isAdmin, setError) => {
   e.preventDefault();
@@ -61,6 +62,7 @@ const onSubmitLogin = (e, setUser, isAdmin, setError) => {
 };
 
 const Login = () => {
+
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -79,7 +81,12 @@ const Login = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  let { id } = useParams();
+  const location = useLocation()
+  const urlParams = new URLSearchParams(location.search)
+  let id = -1
+  if(urlParams.toString() !== ''){
+    id = urlParams.get('id')
+  }
 
   useEffect(() => {
     // TODO: use the id to fetch title and set title using setTitle
@@ -108,7 +115,7 @@ const Login = () => {
   }, [id])
 
   if (user.user_id != undefined) {
-    return <Navigate to={id == undefined ? "/app" : `/app/${id}`} replace={true} />;
+    return <Navigate to={id == undefined ? "/app" : `/app?id=${id}`} replace={true} />;
   } else if (user.isAdmin != undefined) {
     return <Navigate to="/admin/apps" replace={true} />;
   }

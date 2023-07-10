@@ -24,13 +24,19 @@ import Header from "../../components/Header";
 import QuestioneerInput from "../../components/QuestioneerInput";
 import UserInfo from "../../components/UserInfo";
 import TextComponent from "../../components/TextComponent";
+import { useLocation } from 'react-router-dom';
 
 
 const Apps = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  let { id } = useParams();
+  const location = useLocation()
+  const urlParams = new URLSearchParams(location.search)
+  let id = -1
+  if(urlParams.toString() !== ''){
+    id = urlParams.get('id')
+  }
 
   const { user, setUser } = useContext(LoginContext);
   const [ activeApp, setActiveApp ] = useState(-1);
