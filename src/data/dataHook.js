@@ -2,7 +2,9 @@ export const getJson = (endpoint) => {
   return fetch(`https://api.rdhj.dk${endpoint}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
-  }).then(res => res.json());
+  })
+    .then(res => res.json())
+    .catch(err => console.log("HTTPERR", err));
 }
 
 export const postJson = (endpoint, data) => {

@@ -74,11 +74,11 @@ const Apps = () => {
     </React.Fragment>
   );
 
-  const submitForm = (e, flag, app, user) => {
+  const submitForm = (e, flag, app, user, type="Indsend") => {
     e.preventDefault();
     console.log(e, flag);
 
-    if (flag == "Gem") {
+    if (type == "Gem") {
       var form = fromRef.current
     } else {
       var form = e.target
@@ -89,6 +89,7 @@ const Apps = () => {
       return !["plaintext"].includes(item.type);
     });
     
+    console.log(filtered, form, flag, fromRef.current)
     let res = filtered.map((item) => {
       return [item.id, form[`inp${item.id}`].value]
     });
@@ -97,7 +98,7 @@ const Apps = () => {
 
     // Obj er et objekt hvor keys er id og value er svar, brug når der skal gemmes 
 
-    switch (flag) {
+    switch (type) {
       case "Gem":
         const data = {
           appId: app.id,
@@ -156,14 +157,16 @@ const Apps = () => {
       getJson(`/getApplication?id=${activeApp}&d=${Date.now()}`)
       .then(res => {
         console.log(res);
-        getJson(`/getUserApplication?id=${user.server_id}&appid=${activeApp}&d=${Date.now()}`)
+
+        getJson(`/getUserApplication?userId=${user.server_id}&appId=${activeApp}&d=${Date.now()}`)
         .then(appSaved => {
-          if (appSaved.status !== "Error") {
+          if (appSaved !== undefined && appSaved.status !== "Error") {
             setAwnsers(appSaved);
-            console.log("NOTEICE ME", appSaved);
+            setUser(appSaved.user);
           }
           setApplication(res);
         });
+
       });
     } else {
       getJson(`/getAllApplications?id=${user.server_id}&d=${Date.now()}`).then(res => {
@@ -236,14 +239,13 @@ const Apps = () => {
               color="success" 
               size="large" 
               sx={{ mt: 1, ml: 1, width: '16ch'}}
-              onClick={(e) => {setFlag("Indsend")}}
             >Indsend</Button>
             <Button 
               variant="contained" 
               size="large" 
               color="info"
               sx={{ mt: 1, ml: 1, width: '16ch'}}
-              onClick={(e) => {setFlag("Gem"); submitForm(e, flag, application, user)}}
+              onClick={(e) => {submitForm(e, flag, application, user, "Gem")}}
             >Gem</Button>
           </Box>
       }

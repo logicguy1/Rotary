@@ -38,20 +38,26 @@ const QuestioneerInput = ({ row, awnsers, appId }) => {
   const type = row.type;
   const textFieldRef = useRef(null);
   const [ dropdown, setDropdown ] = useState("");
+  const [value, setValue] = useState("")
 
   useEffect(() => {
-    if (appId != undefined && awnsers != null && awnsers[appId] != undefined && awnsers[appId].app[row.id] !== undefined) {
-      const defaultValue = awnsers[appId].app[row.id];
+    console.log("AAAAAA", appId, awnsers, row.id)
+    if (appId != undefined && awnsers != null && awnsers.app[row.id] !== undefined) {
+      // const defaultValue = awnsers[appId].app[row.id];
       if (row.type !== "dropdown") {
-        textFieldRef.current.lastChild.children[0].value = awnsers[appId].app[row.id];
+        // textFieldRef.current.lastChild.children[0].value = awnsers[appId].app[row.id];
+        setValue(awnsers.app[row.id]);
       } else {
-        setDropdown(awnsers[appId].app[row.id])
+        setDropdown(awnsers.app[row.id])
       }
     }   
   }, [awnsers, appId])
 
   const updateSelect = (e) => {
     setDropdown(e.target.value);
+  }
+  const updateValue = (e) => {
+    setValue(e.target.value);
   }
 
   switch (type) {
@@ -87,6 +93,8 @@ const QuestioneerInput = ({ row, awnsers, appId }) => {
                   shrink: true,
                 }} sx={{ width: 400 }}
                 ref={textFieldRef}
+                value={value}
+                onChange={(e) => updateValue(e)}
               />
             ) : (
               <TextField
@@ -96,6 +104,8 @@ const QuestioneerInput = ({ row, awnsers, appId }) => {
                   shrink: true,
                 }} sx={{ width: 400 }}
                 ref={textFieldRef}
+                value={value}
+                onChange={(e) => updateValue(e)}
               />
             )
           }
@@ -126,6 +136,8 @@ const QuestioneerInput = ({ row, awnsers, appId }) => {
                   shrink: true,
                 }} sx={{ width: 400 }}
                 ref={textFieldRef}
+                value={value}
+                onChange={(e) => updateValue(e)}
               />
             ) : (
               <TextField
@@ -138,6 +150,8 @@ const QuestioneerInput = ({ row, awnsers, appId }) => {
                   shrink: true,
                 }} sx={{ width: 400 }}
                 ref={textFieldRef}
+                value={value}
+                onChange={(e) => updateValue(e)}
               />
             )
           }
