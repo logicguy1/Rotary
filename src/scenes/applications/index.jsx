@@ -124,7 +124,7 @@ const Apps = () => {
           setSnackbarMsg("Din ansøgning / tilmælding er blevet indsendt.")
           setOpen(true);
         
-          window.location = "www.rotary.dk";
+          window.location.replace("https://www.rotary.dk/ansogningsskema");
         });
 
         break;
@@ -161,8 +161,12 @@ const Apps = () => {
         getJson(`/getUserApplication?userId=${user.server_id}&appId=${activeApp}&d=${Date.now()}`)
         .then(appSaved => {
           if (appSaved !== undefined && appSaved.status !== "Error") {
-            setAwnsers(appSaved);
-            setUser(appSaved.user);
+            if (appSaved.app !== undefined) {
+              setAwnsers(appSaved);
+            }
+            if (appSaved.user !== undefined) {
+              setUser(appSaved.user);
+            }
           }
           setApplication(res);
         });

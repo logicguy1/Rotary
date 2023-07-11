@@ -21,7 +21,7 @@ const AwnserEnd = ({ checkState, rowId, disableCheck, application, setApplicatio
       if (application.form[i].id === rowId) {
 
         let tmpApp = { ...application };
-        tmpApp.form[i].required = !application.form[i].required;
+        tmpApp.form[i].required = !Boolean(parseInt(application.form[i].required));
         setApplication(tmpApp);
       }
     }
@@ -41,12 +41,12 @@ const AwnserEnd = ({ checkState, rowId, disableCheck, application, setApplicatio
   return (
     <Box>
       <FormControlLabel
-        sx={{ ml: 1, display: "block", "& .css-112ysrj-MuiButtonBase-root-MuiCheckbox-root.Mui-checked": {color: "#b9bbc0"} }}
+        sx={{ ml: 1, display: "block" }}
         control={
           disableCheck ?
-            <Checkbox disabled checked={checkState} onChange={(e) => {updateClick(rowId)}} name={`inp${rowId}required`} />
+            <Checkbox disabled checked={Boolean(parseInt(checkState))} onChange={(e) => {updateClick(rowId)}} name={`inp${rowId}required`} />
           :
-            <Checkbox checked={checkState} onChange={(e) => {updateClick(rowId)}} name={`inp${rowId}required`} />
+            <Checkbox checked={Boolean(parseInt(checkState))} onChange={(e) => {updateClick(rowId)}} name={`inp${rowId}required`} />
           
         }
         label="Skal besvares"

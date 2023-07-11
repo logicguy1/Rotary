@@ -7,7 +7,7 @@ const Title = ({ row }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  return !row.required ? (
+  return !Boolean(parseInt(row.required)) ? (
     <Typography 
       variant="h6"
       color={colors.grey[100]}
@@ -84,7 +84,7 @@ const QuestioneerInput = ({ row, awnsers, appId }) => {
           <Title row={row} />
           
           {
-            row.required ? (
+            Boolean(parseInt(row.required)) ? (
               <TextField
                 required
                 variant="outlined"
@@ -124,7 +124,7 @@ const QuestioneerInput = ({ row, awnsers, appId }) => {
         >
           <Title row={row} />
 {
-            row.required ? (
+            Boolean(parseInt(row.required)) ? (
               <TextField
                 id="outlined-multiline-static"
                 required
@@ -172,7 +172,7 @@ const QuestioneerInput = ({ row, awnsers, appId }) => {
         >
           <Title row={row} />
 {
-            row.required ? (
+            Boolean(parseInt(row.required)) ? (
               <Select
                 required
                 labelId="demo-simple-select-label"
