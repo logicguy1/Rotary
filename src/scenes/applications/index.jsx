@@ -108,7 +108,7 @@ const Apps = () => {
         postJson(`/saveApplication?id=${user.server_id}`, data).then((res) => {
           console.log(res);
           setSnackbarMsg("Din ansøgning / tilmælding er blevet gemt.")
-          setOpen(true);
+          window.location.replace("https://www.rotary.dk/ansogningsskema");
         });
         
         break;
@@ -173,7 +173,7 @@ const Apps = () => {
 
       });
     } else {
-      getJson(`/getAllApplications?id=${user.server_id}&d=${Date.now()}`).then(res => {
+      getJson(`/getAlluserApplications?id=${user.server_id}&d=${Date.now()}`).then(res => {
         console.log(res);
         setApplications(res);
       });
