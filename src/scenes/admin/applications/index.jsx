@@ -183,7 +183,7 @@ const AdminApps = () => {
     const formattedDate = `${year}-${month}-${day}`;
     setApplication(prevState => ({
       ...prevState,
-      stop: formattedDate
+      start: formattedDate
     }));
   }
 

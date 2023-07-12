@@ -1,4 +1,4 @@
-export const getJson = (endpoint) => {
+export const getJson = async (endpoint) => {
   return fetch(`https://api.rdhj.dk${endpoint}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },

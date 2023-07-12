@@ -15,30 +15,50 @@ import Header from "../../components/Header";
 import TextComponent from "../../components/TextComponent";
 import { useLocation } from 'react-router-dom';
 
-const onSubmitLogin = (e, setUser, isAdmin, setError) => {
+const onSubmitLogin = async (e, setUser, isAdmin, setError) => {
+  
   e.preventDefault();
-
   if (!isAdmin) {
-    postJson(`/applicantLogin`, {
+    const res = await getJson("/checkUser?memNumb=" + e.target.Medlemsnummer.value).then(res => {
+      return res
+    })
+    if(res.status == 200){
+      setUser({
+        "server_id": res.id,
         "user_id": e.target.Medlemsnummer.value,
-        "name": e.target.Navn.value,
-        "distrikt": e.target.Distrikt.value,
-        "klub": e.target.Klub.value,
-        "email": e.target.Email.value,
-        "number": e.target.Telefon.value,
-      })
-      .then(res => {
-        setUser({
-          "server_id": res.id,
+        "name": res.navn,
+        "distrikt": res.distrikt,
+        "klub": res.klub,
+        "email": res.email,
+        "number": res.tlf,
+        "isAdmin": false
+      });
+    }else{
+    if(e.target.Medlemsnummer.value != "" && e.target.Navn.value != "" && e.target.Distrikt.value != "" && e.target.Klub.value != "" && e.target.Email.value != "" && e.target.Telefon.value != ""){
+      postJson(`/applicantLogin`, {
           "user_id": e.target.Medlemsnummer.value,
           "name": e.target.Navn.value,
           "distrikt": e.target.Distrikt.value,
           "klub": e.target.Klub.value,
           "email": e.target.Email.value,
           "number": e.target.Telefon.value,
-          "isAdmin": false
+        })
+        .then(res => {
+          setUser({
+            "server_id": res.id,
+            "user_id": e.target.Medlemsnummer.value,
+            "name": e.target.Navn.value,
+            "distrikt": e.target.Distrikt.value,
+            "klub": e.target.Klub.value,
+            "email": e.target.Email.value,
+            "number": e.target.Telefon.value,
+            "isAdmin": false
+          });
         });
-      });
+      }else{
+        setError("Udfyld venligst alle felter");
+      }
+    }
   } else {
     postJson(`/login`, {
         "email": e.target.EmailAdmin.value,
@@ -61,6 +81,7 @@ const onSubmitLogin = (e, setUser, isAdmin, setError) => {
   }
 };
 
+
 const Login = () => {
 
   const theme = useTheme();
@@ -80,7 +101,6 @@ const Login = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
   const location = useLocation()
   const urlParams = new URLSearchParams(location.search)
   let id = -1
