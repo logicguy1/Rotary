@@ -43,7 +43,9 @@ const Sidebar = () => {
 
   const { user } = useContext(LoginContext);
 
-  return (
+  return !user.isAdmin ? (
+    <></>
+  ) : (
     <Box
       sx={{
         "& .pro-sidebar-inner": {
@@ -106,7 +108,7 @@ const Sidebar = () => {
                 setSelected={setSelected}
               />
             ) : (
-              <Item 
+               <Item 
                 title="Ansøgninger"
                 to="/app/"
                 icon={<ContentPasteIcon />}

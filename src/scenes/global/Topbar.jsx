@@ -60,7 +60,7 @@ const Topbar = () => {
         </IconButton>
         */}
         { 
-          user.user_id == undefined && user.isAdmin == undefined ? 
+          user.user_id == undefined || user.isAdmin == false ? 
             <></>
           :
             <IconButton
