@@ -129,6 +129,7 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
           mb={2}
           pt={2}
           borderTop={`2px solid ${colors.primary[400]}`}
+          key={row.id}
         >
           <TextField
             variant="outlined"
@@ -171,6 +172,7 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
           mb={2}
           pt={2}
           borderTop={`2px solid ${colors.primary[400]}`}
+          key={row.id}
         >
           <TextField
             variant="outlined"
@@ -215,6 +217,7 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
           mb={2}
           pt={2}
           borderTop={`2px solid ${colors.primary[400]}`}
+          key={row.id}
         >
           <TextField
             variant="outlined"
@@ -263,6 +266,7 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
             sx={{
               '& .MuiList-root': { backgroundColor: "#f00000" },
             }}
+            key={row.id}
           >
             <TextField
               variant="outlined"
