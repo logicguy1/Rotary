@@ -21,7 +21,7 @@ const AwnserEnd = ({ checkState, rowId, disableCheck, application, setApplicatio
       if (application.form[i].id === rowId) {
 
         let tmpApp = { ...application };
-        tmpApp.form[i].required = !Boolean(parseInt(application.form[i].required));
+        tmpApp.form[i].required = application.form[i].required === "1" ? "0" : "1";
         setApplication(tmpApp);
       }
     }
