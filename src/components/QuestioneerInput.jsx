@@ -87,7 +87,7 @@ const QuestioneerInput = ({ row, awnsers, appId }) => {
             Boolean(parseInt(row.required)) ? (
               <TextField
                 required
-                variant="outlined"
+                variant="filled"
                 name={`inp${row.id}`}
                 inputLabelProps={{
                   shrink: true,
@@ -98,7 +98,7 @@ const QuestioneerInput = ({ row, awnsers, appId }) => {
               />
             ) : (
               <TextField
-                variant="outlined"
+                variant="filled"
                 name={`inp${row.id}`}
                 inputLabelProps={{
                   shrink: true,
@@ -126,9 +126,9 @@ const QuestioneerInput = ({ row, awnsers, appId }) => {
 {
             Boolean(parseInt(row.required)) ? (
               <TextField
-                id="outlined-multiline-static"
+                id="filled-multiline-static"
                 required
-                variant="outlined"
+                variant="filled"
                 multiline
                 rows={4}
                 name={`inp${row.id}`}
@@ -141,8 +141,8 @@ const QuestioneerInput = ({ row, awnsers, appId }) => {
               />
             ) : (
               <TextField
-                id="outlined-multiline-static"
-                variant="outlined"
+                id="filled-multiline-static"
+                variant="filled"
                 multiline
                 name={`inp${row.id}`}
                 rows={4}
