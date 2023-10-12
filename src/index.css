@@ -36,3 +36,11 @@ html, body, #root, .app, .content {
   transform: translate(-50%, -50%);
   position: absolute;
 }
+
+a{
+  color: #999;
+}
+
+a:active{
+  color: #999;
+}

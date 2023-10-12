@@ -138,7 +138,7 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
               shrink: true,
             }}
             multiline
-            rows={2}
+            rows={4}
             sx={{ width: 299, mr: 1 }}
             placeholder="Nyt spøgsmål"
             value={inputValue}
@@ -181,7 +181,7 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
               shrink: true,
             }}
             multiline
-            rows={2}
+            rows={4}
             sx={{ width: 299, mr: 1 }}
             placeholder="Nyt spøgsmål"
             value={inputValue}
@@ -226,7 +226,7 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
               shrink: true,
             }}
             multiline
-            rows={2}
+            rows={4}
             sx={{ width: 299, mr: 1 }}
             placeholder="Nyt spøgsmål"
             value={inputValue}
@@ -275,7 +275,7 @@ const QuestioneerInput = ({ row, application, setApplication }) => {
                 shrink: true,
               }}
               multiline
-              rows={2}
+              rows={4}
               sx={{ width: 299, mr: 1 }}
               placeholder="Nyt spøgsmål"
               value={inputValue}

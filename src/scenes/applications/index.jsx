@@ -3,6 +3,8 @@ import Button, { ButtonProps } from '@mui/material/Button';
 import { tokens } from "../../theme";
 import React, { useContext, useState, useEffect, useRef } from "react";
 import { Navigate, useParams } from "react-router-dom";
+import { styled } from '@mui/material/styles';
+import { jsPDF } from "jspdf";
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -29,7 +31,7 @@ import { useLocation } from 'react-router-dom';
 
 const Apps = () => {
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
+  const colors = tokens(theme.palette.mode)
 
   const location = useLocation()
   const urlParams = new URLSearchParams(location.search)
@@ -74,6 +76,48 @@ const Apps = () => {
     </React.Fragment>
   );
 
+  const print = (e, user, app) => {
+    e.preventDefault()
+    var form = fromRef.current
+    let filtered = app.form.filter((item) => {
+      return !["plaintext"].includes(item.type)
+    })
+    
+    let res = filtered.map((item) => {
+      return [item.id, form[`inp${item.id}`].value]
+    })
+
+    const obj = Object.fromEntries(res)
+    const data = {
+      appId: app.id,
+      user: user,
+      app: obj
+    }
+    postJson(`/getPDF?id=${user.server_id}`, data).then((res) => {
+      console.log(res)
+      const doc = new jsPDF();
+      // decode base64 string, remove space for IE compatibility
+      var byteCharacters = atob(res);
+      var byteNumbers = new Array(byteCharacters.length);
+      for (var i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      var byteArray = new Uint8Array(byteNumbers);
+      var blob = new Blob([byteArray], { type: 'application/pdf' });
+
+      // Create a download link for the PDF
+      var downloadLink = document.createElement('a');
+      downloadLink.href = window.URL.createObjectURL(blob);
+      downloadLink.download = 'downloaded_pdf.pdf';
+
+      // Automatically trigger the click event to initiate the download
+      downloadLink.style.display = 'none'; // Hide the link
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    })
+  }
+
   const submitForm = (e, flag, app, user, type="Indsend") => {
     e.preventDefault();
     console.log(e, flag);
@@ -89,12 +133,10 @@ const Apps = () => {
       return !["plaintext"].includes(item.type);
     });
     
-    console.log(filtered, form, flag, fromRef.current)
     let res = filtered.map((item) => {
       return [item.id, form[`inp${item.id}`].value]
     });
-    let obj = Object.fromEntries(res);
-    console.log(obj);
+    let obj = Object.fromEntries(res)
 
     // Obj er et objekt hvor keys er id og value er svar, brug når der skal gemmes 
 
@@ -108,9 +150,8 @@ const Apps = () => {
         postJson(`/saveApplication?id=${user.server_id}`, data).then((res) => {
           console.log(res);
           setSnackbarMsg("Din ansøgning / tilmælding er blevet gemt.")
-          window.location.replace("https://www.rotary.dk/ansogningsskema");
         });
-        
+        window.location.replace("https://www.rotary.dk/ansogningsskema");
         break;
 
       case "Indsend":
@@ -123,10 +164,8 @@ const Apps = () => {
           console.log(res);
           setSnackbarMsg("Din ansøgning / tilmælding er blevet indsendt.")
           setOpen(true);
-        
-          window.location.replace("https://www.rotary.dk/ansogningsskema");
         });
-
+        window.location.replace("https://www.rotary.dk/ansogningsskema");
         break;
 
       default:
@@ -227,6 +266,7 @@ const Apps = () => {
             </TableContainer>
           </> : <Box
               component="form"
+              id="screen"
               onSubmit={(e) => {submitForm(e, flag, application, user)}}
               ref={fromRef}
             >
@@ -251,6 +291,14 @@ const Apps = () => {
               sx={{ mt: 1, ml: 1, width: '16ch'}}
               onClick={(e) => {submitForm(e, flag, application, user, "Gem")}}
             >Gem</Button>
+            <Button
+              variant="contained"
+              size="large"
+              color="info"
+              sx={{ mt: 1, ml: 1, width: '16ch'}}
+              onClick={(e) => print(e, user, application)}
+            >Print
+            </Button>
           </Box>
       }
     </Box>
