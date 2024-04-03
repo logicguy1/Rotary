@@ -150,8 +150,7 @@ const Apps = () => {
         postJson(`/saveApplication?id=${user.server_id}`, data).then((res) => {
           console.log(res);
           setSnackbarMsg("Din ansøgning / tilmælding er blevet gemt.")
-        });
-        window.location.replace("https://www.rotary.dk/ansogningsskema");
+        })
         break;
 
       case "Indsend":
@@ -164,8 +163,8 @@ const Apps = () => {
           console.log(res);
           setSnackbarMsg("Din ansøgning / tilmælding er blevet indsendt.")
           setOpen(true);
-        });
-        window.location.replace("https://www.rotary.dk/ansogningsskema");
+          window.location.replace("https://www.rotary.dk/ansogningsskema");
+        })
         break;
 
       default:
@@ -297,7 +296,7 @@ const Apps = () => {
               color="info"
               sx={{ mt: 1, ml: 1, width: '16ch'}}
               onClick={(e) => print(e, user, application)}
-            >Print
+            >Udskriv kladde
             </Button>
           </Box>
       }

@@ -138,7 +138,6 @@ const QuestioneerInput = ({ row, awnsers, appId }) => {
                 ref={textFieldRef}
                 value={value}
                 onChange={(e) => updateValue(e)}
-                inputProps={{ maxLength: 2000 }}
               />
             ) : (
               <TextField
@@ -153,7 +152,6 @@ const QuestioneerInput = ({ row, awnsers, appId }) => {
                 ref={textFieldRef}
                 value={value}
                 onChange={(e) => updateValue(e)}
-                inputProps={{ maxLength: 2000 }}
               />
             )
           }
